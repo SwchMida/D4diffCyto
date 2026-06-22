@@ -1,0 +1,45 @@
+{
+  "img_size": [256, 256],
+  "Batch_Size": 16,
+  "EPOCHS": 300,
+  "steps_per_epoch": 500,
+
+  "T": 1000,
+  "sample_distance": 250,
+  "train_start": true,
+  "random_slice": false,
+
+  "beta_schedule": "linear",
+  "noise_fn": "simplex",
+  "loss-type": "l2",
+  "loss_weight": "none",
+
+  "lr": 0.0001,
+  "weight_decay": 0.0,
+
+  "base_channels": 64,
+  "channel_mults": "",
+  "num_res_blocks": 2,
+  "dropout": 0.0,
+
+  "use_attention": true,
+  "attention_resolutions": "32,16,8",
+  "num_heads": 2,
+  "num_head_channels": -1,
+
+  "dataset": "cells",
+  "channels": 3,
+  "data_root": "../data_AMLCytoLMU",
+
+  "group": "D4",
+  "group_fa": false,
+  "group_en": true,
+  "group_fa_train": false,
+
+  "print_every": 10,
+  "skip_vlb": true,
+  "vlb_every": 50,
+
+  "save_imgs": false,
+  "save_vids": false
+}
