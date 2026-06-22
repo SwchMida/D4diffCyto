@@ -1,1 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="Group Equivariant Diffusion for Anomaly Detection in Computational Cytology">
+  <meta name="keywords" content="D4diffCyto, MICCAI, MICCAI 2026, diffusion models, anomaly detection, cytology, computational cytology, equivariance, D4, group equivariant diffusion">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>D4diffCyto</title>
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
+  <style>
+    body {
+      font-family: "Noto Sans", sans-serif;
+      color: #222;
+      background: #ffffff;
+    }
+    .publication-title {
+      font-family: "Google Sans", "Noto Sans", sans-serif;
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 0.75rem;
+    }
+    .publication-authors {
+      font-family: "Google Sans", "Noto Sans", sans-serif;
+      font-size: 1.15rem;
+      margin-top: 0.75rem;
+      line-height: 1.6;
+    }
+    .publication-venue {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #555;
+      margin-top: 0.75rem;
+    }
+    .publication-links {
+      margin-top: 1.5rem;
+    }
+    .publication-links .button {
+      margin: 0.25rem;
+    }
+    .button.is-disabled-paper {
+      opacity: 0.75;
+      cursor: default;
+    }
+    .hero.teaser {
+      padding-top: 1.5rem;
+      padding-bottom: 1.5rem;
+    }
+    .teaser-img {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid #e5e5e5;
+      background: #fff;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .section-title {
+      font-family: "Google Sans", "Noto Sans", sans-serif;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    .content p {
+      font-size: 1.05rem;
+      line-height: 1.65;
+    }
+    .summary-list li {
+      margin-bottom: 0.6rem;
+      line-height: 1.55;
+      font-size: 1.03rem;
+    }
+    .figure-caption {
+      font-size: 0.95rem;
+      color: #555;
+      margin-top: 0.75rem;
+      line-height: 1.45;
+    }
+    .method-card {
+      height: 100%;
+      border: 1px solid #e8e8e8;
+      border-radius: 10px;
+      padding: 1.25rem;
+      background: #fafafa;
+    }
+    .method-card h3 {
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .result-table-container {
+      overflow-x: auto;
+      margin-top: 1rem;
+    }
+    table.results-table {
+      width: 100%;
+      min-width: 900px;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+      background: #fff;
+    }
+    table.results-table th,
+    table.results-table td {
+      border: 1px solid #ddd;
+      padding: 0.45rem 0.55rem;
+      text-align: center;
+      vertical-align: middle;
+    }
+    table.results-table th {
+      background: #f3f3f3;
+      font-weight: 700;
+    }
+    table.results-table td.method {
+      text-align: left;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    table.results-table tr.highlight {
+      background: #f8fbff;
+    }
+    table.results-table tr.group-row td {
+      background: #eeeeee;
+      font-weight: 700;
+      text-align: left;
+    }
+    .bibtex-box {
+      background: #f7f7f7;
+      border-radius: 8px;
+      padding: 1rem;
+      overflow-x: auto;
+      font-size: 0.9rem;
+      border: 1px solid #e5e5e5;
+    }
+    footer.footer {
+      padding: 2.5rem 1.5rem;
+      background: #fafafa;
+    }
+    a {
+      color: #276fbf;
+    }
+    a:hover {
+      color: #174a7c;
+    }
+  </style>
+</head>
+<body>
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop has-text-centered">
+  <h1 class="title is-1 publication-title">
+    Group Equivariant Diffusion for Anomaly Detection in Computational Cytology
+  </h1>
+  <div class="publication-authors">
+    <span>Swarnadip Chatterjee</span>,
+    <span>Ssharvien Kumar Sivakumar</span>,
+    <span>Anirban Mukhopadhyay</span>
+  </div>
+  <div class="publication-venue">
+    MICCAI 2026
+  </div>
+  <div class="publication-links">
+    <span class="link-block">
+      <a class="button is-rounded is-dark is-light is-disabled-paper" href="#" onclick="return false;">
+        <span class="icon">
+          <i class="fas fa-file-pdf"></i>
+        </span>
+        <span>Paper coming soon</span>
+      </a>
+    </span>
+    <span class="link-block">
+      <a class="button is-rounded is-dark" href="https://github.com/SwchMida/D4diffCyto" target="_blank">
+        <span class="icon">
+          <i class="fab fa-github"></i>
+        </span>
+        <span>Code</span>
+      </a>
+    </span>
+  </div>
+</div>
+  </div>
+</section>
+<section class="hero teaser">
+  <div class="container is-max-widescreen">
+    <div class="hero-body">
+      <img src="assets/fig_pipeline.png" class="teaser-img" alt="Overview of the D4-equivariant diffusion framework">
+      <h2 class="subtitle has-text-centered mt-4">
+        D4diffCyto enforces rotation and reflection symmetry in diffusion-based anomaly detection for computational cytology.
+      </h2>
+    </div>
+  </div>
+</section>
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 section-title">Pointwise Summary</h2>
+<div class="content">
+  <ul class="summary-list">
+    <li>
+      Computational cytology is challenging because abnormal cells are rare, heterogeneous, and expensive to annotate.
+    </li>
+    <li>
+      Diffusion anomaly detectors can be trained on normal slide-negative patches and then used to flag abnormal cells at test time.
+    </li>
+    <li>
+      A key problem is that standard diffusion models may produce different reconstructions and anomaly scores for rotated or flipped versions of the same cell patch.
+    </li>
+    <li>
+      D4diffCyto addresses this by enforcing dihedral symmetry, covering rotations and reflections of single-cell patches.
+    </li>
+    <li>
+      We study two complementary routes to D4-consistent anomaly scoring:
+      inference-time symmetry enforcement using Frame Averaging and Equivariant Noise, and architectural symmetry enforcement using a D4-equivariant U-Net.
+    </li>
+    <li>
+      The method is evaluated on two public cytology datasets: MLL bone marrow cytomorphology and AML-LMU peripheral blood cytomorphology.
+    </li>
+    <li>
+      On MLL, FA+EN improves top-400 abnormal-cell retrieval from 57 to 78 compared with vanilla AnoDDPM.
+    </li>
+    <li>
+      On AML-LMU, the D4-equivariant U-Net with attention achieves the best AUC and top-400 retrieval among the evaluated diffusion variants.
+    </li>
+    <li>
+      D4-aware diffusion reduces anomaly-score variation across rotations and flips, making top-K retrieval more stable for realistic cytology screening workflows.
+    </li>
+  </ul>
+</div>
+  </div>
+</section>
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 section-title">Abstract</h2>
+<div class="content">
+  <p>
+    Computational cytology on whole-slide images is challenging because malignant cells are rare, heterogeneous, and annotated slides are scarce. Anomaly detection frameworks can be trained on normal slide-negative patches and then applied at test time to flag abnormal patches in held-out slides. Most unsupervised anomaly detection approaches, including generative ones, are tuned to organ-level imaging and require large curated datasets. In cytology, the signal is cell-centric: rotating or flipping a single-cell patch does not change its diagnostic class, yet standard diffusion models treat transformed views as distinct inputs, leading to transformation-dependent reconstructions and unstable anomaly scores.
+  </p>
+  <p>
+    We propose a D4-equivariant diffusion framework that enforces rotation and reflection symmetry both architecturally, via a D4-equivariant U-Net, and at inference, via equivariant noise coupling and frame averaging. This alignment with biological invariance yields transformation-consistent pseudo-healthy reconstructions and more stable anomaly ranking under symmetry. On two publicly available cytology datasets of bone marrow and peripheral blood smears, our D4-equivariant diffusion models achieve higher AUC and retrieve more abnormal cells in the top-K predictions than non-equivariant generative baselines, a deep one-class baseline, and a multiple instance learning based method, while substantially reducing score variance across rotations and flips.
+  </p>
+</div>
+  </div>
+</section>
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 section-title">Method Overview</h2>
+<div class="columns">
+  <div class="column">
+    <div class="method-card">
+      <h3>Partial diffusion reconstruction</h3>
+      <p>
+        A diffusion model is trained only on normal cytology patches. At test time, each patch is noised to an intermediate step and denoised back to obtain a pseudo-normal reconstruction. The anomaly score is the mean-squared reconstruction error.
+      </p>
+    </div>
+  </div>
+  <div class="column">
+    <div class="method-card">
+      <h3>Inference-time D4 enforcement</h3>
+      <p>
+        A standard U-Net can be made D4-consistent during inference using equivariant noise coupling and frame averaging across rotated and reflected views of the input patch.
+      </p>
+    </div>
+  </div>
+  <div class="column">
+    <div class="method-card">
+      <h3>Architectural D4 enforcement</h3>
+      <p>
+        The U-Net backbone is made D4-equivariant by tying convolutional filters across rotations and reflections. We also evaluate an attention-augmented D4-equivariant U-Net variant.
+      </p>
+    </div>
+  </div>
+</div>
+  </div>
+</section>
+<section class="section">
+  <div class="container is-max-widescreen">
+    <h2 class="title is-3 section-title has-text-centered">Main Quantitative Results</h2>
+<div class="result-table-container">
+  <table class="results-table">
+    <thead>
+      <tr>
+        <th rowspan="2">Method</th>
+        <th colspan="4">MLL</th>
+        <th colspan="4">AML-LMU</th>
+      </tr>
+      <tr>
+        <th>AUC</th>
+        <th>TP400</th>
+        <th>TP200</th>
+        <th>TP100</th>
+        <th>AUC</th>
+        <th>TP400</th>
+        <th>TP200</th>
+        <th>TP100</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="group-row">
+        <td colspan="9">Baselines</td>
+      </tr>
+      <tr>
+        <td class="method">ItS2CLR</td>
+        <td>0.521107</td>
+        <td>27</td>
+        <td>20</td>
+        <td>19</td>
+        <td>0.360515</td>
+        <td>92</td>
+        <td>38</td>
+        <td>13</td>
+      </tr>
+      <tr>
+        <td class="method">Deep SVDD</td>
+        <td>0.613331</td>
+        <td>49</td>
+        <td>35</td>
+        <td>21</td>
+        <td>0.514742</td>
+        <td>227</td>
+        <td>122</td>
+        <td>56</td>
+      </tr>
+      <tr>
+        <td class="method">f-AnoGAN</td>
+        <td>0.594601</td>
+        <td>37</td>
+        <td>24</td>
+        <td>9</td>
+        <td>0.538857</td>
+        <td>273</td>
+        <td>131</td>
+        <td>57</td>
+      </tr>
+      <tr>
+        <td class="method">THOR Gaussian</td>
+        <td>0.540851</td>
+        <td>24</td>
+        <td>14</td>
+        <td>7</td>
+        <td>0.582212</td>
+        <td>247</td>
+        <td>137</td>
+        <td>68</td>
+      </tr>
+      <tr>
+        <td class="method">THOR Simplex</td>
+        <td>0.404264</td>
+        <td>8</td>
+        <td>3</td>
+        <td>1</td>
+        <td>0.544415</td>
+        <td>207</td>
+        <td>104</td>
+        <td>58</td>
+      </tr>
+      <tr>
+        <td class="method">BerDiff</td>
+        <td>0.550799</td>
+        <td>44</td>
+        <td>32</td>
+        <td>26</td>
+        <td>0.708558</td>
+        <td>313</td>
+        <td>157</td>
+        <td>64</td>
+      </tr>
+      <tr>
+        <td class="method">AnoDDPM</td>
+        <td>0.632846</td>
+        <td>57</td>
+        <td>30</td>
+        <td>18</td>
+        <td>0.694320</td>
+        <td>311</td>
+        <td>162</td>
+        <td>83</td>
+      </tr>
+      <tr class="group-row">
+        <td colspan="9">D4-equivariant diffusion variants</td>
+      </tr>
+      <tr>
+        <td class="method">FA only</td>
+        <td>0.612543</td>
+        <td>46</td>
+        <td>32</td>
+        <td>19</td>
+        <td>0.680111</td>
+        <td>277</td>
+        <td>144</td>
+        <td>72</td>
+      </tr>
+      <tr class="highlight">
+        <td class="method">FA+EN</td>
+        <td><strong>0.684121</strong></td>
+        <td><strong>78</strong></td>
+        <td><strong>53</strong></td>
+        <td><strong>34</strong></td>
+        <td>0.678373</td>
+        <td>285</td>
+        <td>149</td>
+        <td>75</td>
+      </tr>
+      <tr class="highlight">
+        <td class="method">D4 conv.</td>
+        <td>0.675404</td>
+        <td>74</td>
+        <td><strong>53</strong></td>
+        <td>27</td>
+        <td>0.699635</td>
+        <td>315</td>
+        <td>159</td>
+        <td><strong>86</strong></td>
+      </tr>
+      <tr class="highlight">
+        <td class="method">D4 conv. + attn.</td>
+        <td>0.679251</td>
+        <td>67</td>
+        <td>44</td>
+        <td>33</td>
+        <td><strong>0.720098</strong></td>
+        <td><strong>325</strong></td>
+        <td><strong>162</strong></td>
+        <td>81</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<p class="figure-caption has-text-centered">
+  Patch-level anomaly detection results on MLL and AML-LMU. TP400, TP200, and TP100 denote the number of abnormal cells retrieved among the top-K most anomalous patches.
+</p>
+  </div>
+</section>
+<section class="section">
+  <div class="container is-max-widescreen">
+    <h2 class="title is-3 section-title has-text-centered">Qualitative Results</h2>
+<img src="assets/qualitative_comparison.png" class="teaser-img" alt="Qualitative comparison between AnoDDPM and D4-equivariant AnoDDPM">
+<p class="figure-caption has-text-centered">
+  Qualitative comparison of vanilla AnoDDPM and D4-equivariant AnoDDPM on MLL bone marrow and AML-LMU peripheral blood cytology patches. Each panel shows inputs, reconstructions, and anomaly-map overlays with MSE scores.
+</p>
+  </div>
+</section>
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 section-title">BibTeX</h2>
+<pre class="bibtex-box"><code>@inproceedings{chatterjee2026d4diffcyto,
 
+title     = {Group Equivariant Diffusion for Anomaly Detection in Computational Cytology},
+author    = {Chatterjee, Swarnadip and Sivakumar, Ssharvien Kumar and Mukhopadhyay, Anirban},
+booktitle = {Medical Image Computing and Computer Assisted Intervention – MICCAI},
+year      = {2026}
+}
+
+  </div>
+</section>
+<footer class="footer">
+  <div class="container is-max-desktop">
+    <div class="content has-text-centered">
+      <p>
+        This project page presents the MICCAI 2026 paper <strong>Group Equivariant Diffusion for Anomaly Detection in Computational Cytology</strong>.
+      </p>
+      <p>
+        Website style inspired by common academic project pages.
+      </p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>
