@@ -8,6 +8,12 @@ Authors: Swarnadip Chatterjee, Ssharvien Kumar Sivakumar, and Anirban Mukhopadhy
 
 This repository contains code for D4-aware diffusion-based anomaly detection on cytology single-cell patches. The method targets the setting where rotations and flips of a centered cell patch should not change its diagnostic class, but standard diffusion-based anomaly detectors may produce transformation-dependent reconstructions and anomaly scores.
 
+## Overview
+
+![Overview of the D4-equivariant diffusion framework](assets/fig_pipeline.jpeg)
+
+This figure shows the D4 Cayley diagram, the training-time diffusion process, and the inference-time partial diffusion reconstruction used for anomaly scoring.
+
 ## Implemented variants
 
 The repository includes code for the following variants:
