@@ -1,0 +1,46 @@
+{
+  "img_size": [256, 256],
+  "Batch_Size": 16,
+  "EPOCHS": 300,
+  "T": 1000,
+
+  "base_channels": 64,
+  "channel_mults": "",
+  "dropout": 0,
+  "attention_resolutions": "16,8",
+  "num_heads": 2,
+  "num_head_channels": -1,
+
+  "beta_schedule": "linear",
+  "loss-type": "l2",
+  "loss_weight": "none",
+  "lr": 0.0001,
+  "weight_decay": 0.0,
+
+  "train_start": true,
+  "random_slice": false,
+  "sample_distance": 250,
+
+  "save_imgs": false,
+  "save_vids": false,
+
+  "noise_fn": "simplex",
+
+  "dataset": "cells",
+  "channels": 3,
+  "data_root": "../data",
+
+  "steps_per_epoch": 500,
+
+  "print_every": 10,
+  "skip_vlb": true,
+  "vlb_every": 50,
+
+  "group": "D4",
+
+  "group_fa": true,
+  "group_en": true,
+  "group_fa_train": false,
+
+  "use_attention": false
+}
