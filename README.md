@@ -10,7 +10,7 @@ This repository contains code for D4-aware diffusion-based anomaly detection on 
 
 ## Overview
 
-![Overview of the D4-equivariant diffusion framework](assets/fig_pipeline.jpeg)
+![Overview of the D4-equivariant diffusion framework](assets/fig_pipeline.png)
 
 This figure shows the D4 Cayley diagram, the training-time diffusion process, and the inference-time partial diffusion reconstruction used for anomaly scoring.
 
