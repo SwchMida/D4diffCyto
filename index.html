@@ -70,6 +70,11 @@
       line-height: 1.55;
       font-size: 1.03rem;
     }
+    .pipeline-list li {
+      margin-bottom: 0.55rem;
+      line-height: 1.55;
+      font-size: 1.02rem;
+    }
     .figure-caption {
       font-size: 0.95rem;
       color: #555;
@@ -86,6 +91,50 @@
     .method-card h3 {
       font-weight: 700;
       margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+    .method-card p {
+      font-size: 0.98rem;
+      line-height: 1.55;
+    }
+    .detail-card {
+      height: 100%;
+      border: 1px solid #e8e8e8;
+      border-radius: 12px;
+      padding: 1.25rem;
+      background: #ffffff;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.035);
+    }
+    .detail-card h3 {
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+      font-size: 1.15rem;
+    }
+    .detail-card p {
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+    .small-equation {
+      background: #f7f7f7;
+      border: 1px solid #e4e4e4;
+      border-radius: 8px;
+      padding: 0.85rem;
+      font-family: "Courier New", monospace;
+      font-size: 0.92rem;
+      overflow-x: auto;
+      margin-top: 0.75rem;
+      margin-bottom: 0.75rem;
+      line-height: 1.55;
+    }
+    .tag-pill {
+      display: inline-block;
+      background: #eef5ff;
+      color: #164a7a;
+      border-radius: 999px;
+      padding: 0.25rem 0.65rem;
+      margin: 0.15rem;
+      font-size: 0.9rem;
+      font-weight: 600;
     }
     .result-table-container {
       overflow-x: auto;
@@ -206,8 +255,7 @@
       D4diffCyto addresses this by enforcing dihedral symmetry, covering rotations and reflections of single-cell patches.
     </li>
     <li>
-      We study two complementary routes to D4-consistent anomaly scoring:
-      inference-time symmetry enforcement using Frame Averaging and Equivariant Noise, and architectural symmetry enforcement using a D4-equivariant U-Net.
+      We study two complementary routes to D4-consistent anomaly scoring: inference-time symmetry enforcement using Frame Averaging and Equivariant Noise, and architectural symmetry enforcement using a D4-equivariant U-Net.
     </li>
     <li>
       The method is evaluated on two public cytology datasets: MLL bone marrow cytomorphology and AML-LMU peripheral blood cytomorphology.
@@ -222,6 +270,113 @@
       D4-aware diffusion reduces anomaly-score variation across rotations and flips, making top-K retrieval more stable for realistic cytology screening workflows.
     </li>
   </ul>
+</div>
+  </div>
+</section>
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 section-title">Motivation</h2>
+<div class="content">
+  <p>
+    Diffusion-based anomaly detection is attractive for cytology because it can be trained using only normal cells. A model learns a normal-cell appearance prior, and at test time an abnormal query patch is partially diffused and reconstructed toward the normal distribution. The residual between the input and the reconstruction becomes the anomaly signal.
+  </p>
+  <p>
+    However, single-cell cytology is different from organ-level medical imaging. In brain MRI, retinal OCT, or chest X-ray, anatomy often has a fixed orientation and lesions are spatially tied to that anatomy. In cytology, a centered cell patch can be rotated or flipped without changing its diagnostic meaning. A malignant or abnormal cell remains abnormal under the eight rotations and reflections of the square image grid.
+  </p>
+  <p>
+    This creates a structural mismatch: a standard diffusion model may treat rotated or flipped versions of the same cell as different inputs, leading to different pseudo-healthy reconstructions and different anomaly scores. Under extreme class imbalance, even small score changes can alter the top-K ranking and affect which cells are surfaced for expert review.
+  </p>
+</div>
+<div class="has-text-centered mt-4">
+  <span class="tag-pill">Rare abnormal cells</span>
+  <span class="tag-pill">Normal-only training</span>
+  <span class="tag-pill">Partial diffusion reconstruction</span>
+  <span class="tag-pill">D4 symmetry</span>
+  <span class="tag-pill">Stable top-K retrieval</span>
+</div>
+  </div>
+</section>
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 section-title">From AnoDDPM to D4diffCyto</h2>
+<div class="content">
+  <p>
+    The starting point is AnoDDPM-style anomaly detection. Instead of generating a sample from pure noise, the test image is noised only up to an intermediate diffusion step and then denoised back. This partial diffusion reconstruction is useful because the model is trained on normal data, so the reverse process tends to reconstruct a pseudo-normal version of the query. The anomaly map is obtained from the reconstruction residual.
+  </p>
+  <div class="small-equation">
+    Input patch x0 → partial noising to xt* → reverse diffusion reconstruction x̂0<br>
+    Anomaly map: |x0 − x̂0|<br>
+    Anomaly score: mean squared reconstruction error
+  </div>
+  <p>
+    D4diffCyto keeps this partial-reconstruction principle but adapts it to cell-centric cytology. The key modification is that reconstruction should be consistent under the D4 group: rotations by 0°, 90°, 180°, 270° and their reflected counterparts. The goal is not only to obtain a good anomaly score, but to make the score stable under diagnostically irrelevant transformations.
+  </p>
+</div>
+  </div>
+</section>
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 section-title">What are FA and EN?</h2>
+<div class="columns">
+  <div class="column">
+    <div class="detail-card">
+      <h3>Frame Averaging (FA)</h3>
+      <p>
+        Frame Averaging applies the model to all transformed views of the same input and then maps the outputs back to the original orientation before averaging. For D4diffCyto, the frame is the D4 orbit of a cell patch: all rotations and flips of the same image.
+      </p>
+      <p>
+        Intuitively, FA asks the model: “What anomaly score would you give if the same cell appeared in every allowed orientation?” Averaging over these answers suppresses orientation-specific fluctuations and produces a more symmetry-consistent score.
+      </p>
+      <div class="small-equation">
+        FA score ≈ average over g in D4 of Score(g · x)
+      </div>
+    </div>
+  </div>
+  <div class="column">
+    <div class="detail-card">
+      <h3>Equivariant Noise (EN)</h3>
+      <p>
+        Diffusion sampling is stochastic. Even if the denoiser is equivariant, independently sampled noise can make the trajectory for a rotated cell differ from the rotated trajectory of the original cell. EN fixes this by tying the random noise across transformed views.
+      </p>
+      <p>
+        For each D4 transform g, D4diffCyto uses the transformed version of the same base noise. Thus, the forward and reverse trajectories share the same underlying randomness up to the group action.
+      </p>
+      <div class="small-equation">
+        Base noise: ε<br>
+        Noise for transformed view g · x: εg = g · ε
+      </div>
+    </div>
+  </div>
+</div>
+<div class="content mt-4">
+  <p>
+    FA and EN play complementary roles. FA symmetrizes the outputs over the D4 orbit, while EN makes the stochastic diffusion trajectory itself consistent across transformed views. In D4diffCyto, the two are combined for inference-time D4 enforcement with a standard U-Net.
+  </p>
+</div>
+  </div>
+</section>
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 section-title">How FA+EN is adapted in D4diffCyto</h2>
+<div class="content">
+  <p>
+    In generic structure-preserving diffusion, FA and EN are used to make diffusion outputs respect a chosen transformation group. D4diffCyto adapts this idea to the specific operational problem of cytology screening: the system should rank abnormal cells consistently even when a cell appears rotated or flipped.
+  </p>
+  <p>
+    For inference-time D4 enforcement, a standard U-Net is first trained using the usual diffusion objective. No special group-equivariant architecture is required during training. At test time, the input patch is transformed by each element of D4. The same base noising variables are transformed accordingly, partial diffusion reconstruction is performed for each transformed view, residuals are mapped back to the original orientation, and scores are averaged.
+  </p>
+  <ol class="pipeline-list">
+    <li>Start with a query cell patch x0.</li>
+    <li>Generate the D4 orbit: rotated and flipped versions of x0.</li>
+    <li>Use equivariant noise so each transformed view receives the correspondingly transformed stochastic noise.</li>
+    <li>Run partial diffusion reconstruction for each view.</li>
+    <li>Map anomaly maps back to the original orientation.</li>
+    <li>Average residual maps and scalar scores over the orbit.</li>
+    <li>Use the final averaged score for top-K abnormal-cell ranking.</li>
+  </ol>
+  <p>
+    This gives a simple way to enforce symmetry at inference time while retaining the ordinary U-Net training pipeline. It is especially useful when one wants to add symmetry consistency to a trained diffusion anomaly detector without redesigning the entire model architecture.
+  </p>
 </div>
   </div>
 </section>
@@ -244,28 +399,59 @@
 <div class="columns">
   <div class="column">
     <div class="method-card">
-      <h3>Partial diffusion reconstruction</h3>
+      <h3>1. Normal-only training</h3>
       <p>
-        A diffusion model is trained only on normal cytology patches. At test time, each patch is noised to an intermediate step and denoised back to obtain a pseudo-normal reconstruction. The anomaly score is the mean-squared reconstruction error.
+        The diffusion model is trained only on normal cytology patches. This is well suited to cytology, where collecting exhaustive abnormal-cell annotations is difficult, but normal or slide-negative examples are more accessible.
       </p>
     </div>
   </div>
   <div class="column">
     <div class="method-card">
-      <h3>Inference-time D4 enforcement</h3>
+      <h3>2. Partial reconstruction</h3>
       <p>
-        A standard U-Net can be made D4-consistent during inference using equivariant noise coupling and frame averaging across rotated and reflected views of the input patch.
+        At test time, the query patch is noised to an intermediate timestep and denoised back. The reconstruction is interpreted as a pseudo-normal version of the input, and the residual is used as the anomaly signal.
       </p>
     </div>
   </div>
   <div class="column">
     <div class="method-card">
-      <h3>Architectural D4 enforcement</h3>
+      <h3>3. Top-K retrieval</h3>
       <p>
-        The U-Net backbone is made D4-equivariant by tying convolutional filters across rotations and reflections. We also evaluate an attention-augmented D4-equivariant U-Net variant.
+        Instead of only asking whether a whole slide is positive, the method ranks individual cell patches. This is important for realistic cytology workflows where only a small number of candidate cells may be inspected.
       </p>
     </div>
   </div>
+</div>
+<div class="columns mt-4">
+  <div class="column">
+    <div class="method-card">
+      <h3>Inference-time D4 route: FA+EN</h3>
+      <p>
+        A standard U-Net is trained as usual. During inference, D4 consistency is imposed by applying rotations and flips to the input, coupling their diffusion noise through EN, reconstructing each transformed view, and averaging the resulting scores and residual maps using FA.
+      </p>
+    </div>
+  </div>
+  <div class="column">
+    <div class="method-card">
+      <h3>Architectural D4 route: D4 U-Net</h3>
+      <p>
+        The denoiser itself is made D4-equivariant using group-tied convolutional filters. This reduces orientation-specific variability inside the model and encourages the denoising function to respect rotations and reflections by design.
+      </p>
+    </div>
+  </div>
+  <div class="column">
+    <div class="method-card">
+      <h3>D4 U-Net with attention</h3>
+      <p>
+        The attention-augmented variant extends the D4-equivariant backbone with an attention block, allowing the model to capture richer spatial interactions while still preserving the intended group-aware structure.
+      </p>
+    </div>
+  </div>
+</div>
+<div class="content mt-5">
+  <p>
+    These two routes are complementary. FA+EN is an inference-time mechanism that can be applied to a standard denoiser, while the D4-equivariant U-Net builds the symmetry into the architecture itself. Both are designed to reduce nuisance orientation variance and improve the reliability of abnormal-cell ranking.
+  </p>
 </div>
   </div>
 </section>
@@ -367,9 +553,9 @@
         <td>57</td>
         <td>30</td>
         <td>18</td>
-        <td><strong>162</strong></td>
+        <td>0.694320</td>
         <td>311</td>
-        <td>162</td>
+        <td><strong>162</strong></td>
         <td>83</td>
       </tr>
       <tr class="group-row">
@@ -440,11 +626,12 @@
   <div class="container is-max-desktop">
     <h2 class="title is-3 section-title">BibTeX</h2>
 <pre class="bibtex-box"><code>@inproceedings{chatterjee2026d4diffcyto,
-  title     = {Group Equivariant Diffusion for Anomaly Detection in Computational Cytology},
-  author    = {Chatterjee, Swarnadip and Sivakumar, Ssharvien Kumar and Mukhopadhyay, Anirban},
-  booktitle = {Medical Image Computing and Computer Assisted Intervention -- MICCAI},
-  year      = {2026}
-}</code></pre>
+
+title     = {Group Equivariant Diffusion for Anomaly Detection in Computational Cytology},
+author    = {Chatterjee, Swarnadip and Sivakumar, Ssharvien Kumar and Mukhopadhyay, Anirban},
+booktitle = {Medical Image Computing and Computer Assisted Intervention – MICCAI},
+year      = {2026}
+}
 
   </div>
 </section>
