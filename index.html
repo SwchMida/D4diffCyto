@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="description" content="Group Equivariant Diffusion for Anomaly Detection in Computational Cytology">
-  <meta name="keywords" content="D4diffCyto, MICCAI, MICCAI 2026, diffusion models, anomaly detection, cytology, computational cytology, equivariance, D4, group equivariant diffusion">
+  <meta name="keywords" content="D4diffCyto, MICCAI, MICCAI 2026, diffusion models, anomaly detection, cytology, computational cytology, equivariance, D4, group equivariant diffusion, whole-slide cytology">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>D4diffCyto</title>
   <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
@@ -39,15 +39,20 @@
     .publication-links .button {
       margin: 0.25rem;
     }
-    .button.is-disabled-paper {
-      opacity: 0.75;
-      cursor: default;
-    }
     .hero.teaser {
       padding-top: 1.5rem;
       padding-bottom: 1.5rem;
     }
     .teaser-img {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid #e5e5e5;
+      background: #fff;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .medium-img {
       width: 100%;
       border-radius: 8px;
       border: 1px solid #e5e5e5;
@@ -114,6 +119,25 @@
       font-size: 1rem;
       line-height: 1.6;
     }
+    .contrast-card {
+      height: 100%;
+      border: 1px solid #e2e2e2;
+      border-radius: 12px;
+      padding: 1.25rem;
+      background: #ffffff;
+    }
+    .contrast-card h3 {
+      font-weight: 700;
+      margin-bottom: 0.7rem;
+      font-size: 1.15rem;
+    }
+    .contrast-card ul {
+      margin-left: 1.2rem;
+    }
+    .contrast-card li {
+      margin-bottom: 0.55rem;
+      line-height: 1.55;
+    }
     .small-equation {
       background: #f7f7f7;
       border: 1px solid #e4e4e4;
@@ -135,6 +159,16 @@
       margin: 0.15rem;
       font-size: 0.9rem;
       font-weight: 600;
+    }
+    .key-message {
+      background: #f7fbff;
+      border-left: 5px solid #276fbf;
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin-top: 1.25rem;
+      margin-bottom: 1.25rem;
+      font-size: 1.05rem;
+      line-height: 1.6;
     }
     .result-table-container {
       overflow-x: auto;
@@ -208,11 +242,11 @@
   </div>
   <div class="publication-links">
     <span class="link-block">
-      <a class="button is-rounded is-dark is-light is-disabled-paper" href="#" onclick="return false;">
+      <a class="button is-rounded is-dark" href="https://arxiv.org/abs/2607.25503" target="_blank">
         <span class="icon">
           <i class="fas fa-file-pdf"></i>
         </span>
-        <span>Paper coming soon</span>
+        <span>Paper</span>
       </a>
     </span>
     <span class="link-block">
@@ -243,22 +277,22 @@
 <div class="content">
   <ul class="summary-list">
     <li>
-      Computational cytology is challenging because abnormal cells are rare, heterogeneous, and expensive to annotate.
+      Computational cytology is a cell-level search problem: a whole-slide image may contain enormous numbers of cells, but only a tiny fraction may be abnormal.
     </li>
     <li>
-      Diffusion anomaly detectors can be trained on normal slide-negative patches and then used to flag abnormal cells at test time.
+      Detailed cell-level annotation is difficult to scale, so D4diffCyto follows a normality-learning setting where the model is trained on normal cells and used to rank suspicious cells.
     </li>
     <li>
-      A key problem is that standard diffusion models may produce different reconstructions and anomaly scores for rotated or flipped versions of the same cell patch.
+      Unlike many histology patches, a centered cytology cell patch has no preferred global orientation: rotating or flipping the cell should not change its patch-level diagnostic label.
     </li>
     <li>
-      D4diffCyto addresses this by enforcing dihedral symmetry, covering rotations and reflections of single-cell patches.
+      Standard diffusion anomaly detectors may nevertheless reconstruct rotated or flipped versions of the same cell differently, causing unstable anomaly scores and top-K rankings.
     </li>
     <li>
-      We study two complementary routes to D4-consistent anomaly scoring: inference-time symmetry enforcement using Frame Averaging and Equivariant Noise, and architectural symmetry enforcement using a D4-equivariant U-Net.
+      D4diffCyto addresses this by enforcing dihedral D4 symmetry, covering rotations and reflections of the square image grid.
     </li>
     <li>
-      The method is evaluated on two public cytology datasets: MLL bone marrow cytomorphology and AML-LMU peripheral blood cytomorphology.
+      We study two complementary routes: inference-time D4 enforcement using Frame Averaging and Equivariant Noise, and architectural D4 enforcement using a D4-equivariant U-Net.
     </li>
     <li>
       On MLL, FA+EN improves top-400 abnormal-cell retrieval from 57 to 78 compared with vanilla AnoDDPM.
@@ -266,33 +300,116 @@
     <li>
       On AML-LMU, the D4-equivariant U-Net with attention achieves the best AUC and top-400 retrieval among the evaluated diffusion variants.
     </li>
-    <li>
-      D4-aware diffusion reduces anomaly-score variation across rotations and flips, making top-K retrieval more stable for realistic cytology screening workflows.
-    </li>
   </ul>
 </div>
   </div>
 </section>
 <section class="section">
   <div class="container is-max-desktop">
-    <h2 class="title is-3 section-title">Motivation</h2>
+    <h2 class="title is-3 section-title">Why cytology?</h2>
 <div class="content">
   <p>
-    Diffusion-based anomaly detection is attractive for cytology because it can be trained using only normal cells. A model learns a normal-cell appearance prior, and at test time an abnormal query patch is partially diffused and reconstructed toward the normal distribution. The residual between the input and the reconstruction becomes the anomaly signal.
+    Cytology studies disease at the level of individual cells and small cell clusters. In liquid-based cytology and other cytology workflows, cells are collected from the patient, placed on a slide, scanned as a whole-slide image, and then analyzed computationally. This makes cytology highly suitable for cell-level artificial intelligence, but also creates an enormous search problem.
   </p>
   <p>
-    However, single-cell cytology is different from organ-level medical imaging. In brain MRI, retinal OCT, or chest X-ray, anatomy often has a fixed orientation and lesions are spatially tied to that anatomy. In cytology, a centered cell patch can be rotated or flipped without changing its diagnostic meaning. A malignant or abnormal cell remains abnormal under the eight rotations and reflections of the square image grid.
+    A digital cytology slide may contain tens or hundreds of thousands of cells. In many screening settings, only a very small fraction of these cells may actually be malignant or atypical. The practical task is therefore not only to classify a slide, but to help the expert find the few suspicious cells hidden within a vast background of normal cells.
+  </p>
+  <div class="key-message">
+    The central goal of D4diffCyto is to make diffusion-based anomaly detection useful for this “needle-in-a-haystack” setting: learn normality from normal cells, assign anomaly scores to test cells, and retrieve a compact top-K shortlist for expert review.
+  </div>
+</div>
+<img src="assets/cytology_workflow.png" class="medium-img" alt="Cytology workflow from sample collection to whole-slide scanning and cell detection">
+<p class="figure-caption has-text-centered">
+  A cytology workflow: sample collection, slide preparation, whole-slide scanning, and cell or nucleus detection for computational analysis.
+</p>
+  </div>
+</section>
+<section class="section">
+  <div class="container is-max-widescreen">
+    <h2 class="title is-3 section-title has-text-centered">The needle-in-a-haystack problem</h2>
+<div class="columns is-vcentered">
+  <div class="column is-half">
+    <img src="assets/cytology_wsi.png" class="medium-img" alt="Whole-slide cytology image with many cells">
+  </div>
+  <div class="column is-half">
+    <div class="content">
+      <p>
+        Cytology slides can contain a very large number of candidate cells. However, abnormal cells may be extremely rare, especially in early detection and screening settings. This creates severe class imbalance and makes exhaustive manual search difficult.
+      </p>
+      <p>
+        The problem is even harder because abnormal morphology can be heterogeneous and subtle. Cell-level annotation requires substantial expert time, and in many real datasets we may know the slide diagnosis but not the label of every individual cell.
+      </p>
+      <p>
+        For this reason, D4diffCyto is framed as normality learning: the model learns the appearance of normal cells and then ranks test cells by how strongly they deviate from that learned normality.
+      </p>
+    </div>
+  </div>
+</div>
+<p class="figure-caption has-text-centered">
+  Whole-slide cytology contains a very large search space. The aim is to reduce this search space to a manageable list of suspicious cells.
+</p>
+  </div>
+</section>
+<section class="section">
+  <div class="container is-max-widescreen">
+    <h2 class="title is-3 section-title has-text-centered">Why D4 symmetry is especially natural in cytology</h2>
+<div class="columns">
+  <div class="column">
+    <div class="contrast-card">
+      <h3>Histology WSI patches</h3>
+      <img src="assets/histology_patch_context.png" class="medium-img" alt="Histology patch with tissue context">
+      <ul class="mt-4">
+        <li>
+          A histology patch often preserves tissue architecture, neighborhood organization, glands, stroma, invasive fronts, or other contextual structures.
+        </li>
+        <li>
+          The label of a patch may depend not only on a single object, but also on how structures are arranged within the tissue context.
+        </li>
+        <li>
+          Rotations and flips may still be useful as augmentation, but the interpretation of a patch can be tied to larger tissue-level organization.
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="column">
+    <div class="contrast-card">
+      <h3>Cytology WSI patches</h3>
+      <img src="assets/cytology_workflow.png" class="medium-img" alt="Cytology cell-centric workflow">
+      <ul class="mt-4">
+        <li>
+          In cytology, the signal is often cell-centric: a cropped patch is centered around an individual cell or a small cell cluster.
+        </li>
+        <li>
+          The diagnostic identity of a centered cell should not change if the patch is rotated by 90°, 180°, or 270°, or reflected.
+        </li>
+        <li>
+          This makes the patch-level label naturally invariant to the D4 group of square-image rotations and reflections.
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+<div class="key-message">
+  D4diffCyto exploits a simple biological and imaging fact: in liquid-based and cell-centric cytology, a cell has no preferred orientation. A diffusion anomaly detector should therefore produce stable reconstructions and anomaly scores under rotations and flips of the same cell.
+</div>
+  </div>
+</section>
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 section-title">From annotation to normality learning</h2>
+<div class="content">
+  <p>
+    Exhaustively annotating all abnormal cells is difficult because a slide can contain an enormous number of candidate cells, expert time is limited, and abnormal morphology can vary between cases. Weak supervision through slide-level labels is practical, but when abnormal cells are extremely rare, the slide label becomes a weak signal for identifying the actual abnormal instances.
   </p>
   <p>
-    This creates a structural mismatch: a standard diffusion model may treat rotated or flipped versions of the same cell as different inputs, leading to different pseudo-healthy reconstructions and different anomaly scores. Under extreme class imbalance, even small score changes can alter the top-K ranking and affect which cells are surfaced for expert review.
+    D4diffCyto follows the broader idea of learning from normality. Cells from negative slides can be treated as reliably normal. A model can therefore learn a normal-cell appearance prior without needing abnormal-cell annotations. At test time, cells that deviate strongly from this normality model receive high anomaly scores and can be ranked for expert inspection.
   </p>
 </div>
 <div class="has-text-centered mt-4">
-  <span class="tag-pill">Rare abnormal cells</span>
-  <span class="tag-pill">Normal-only training</span>
-  <span class="tag-pill">Partial diffusion reconstruction</span>
-  <span class="tag-pill">D4 symmetry</span>
-  <span class="tag-pill">Stable top-K retrieval</span>
+  <span class="tag-pill">Normal slide-negative cells</span>
+  <span class="tag-pill">No cell-level abnormal labels</span>
+  <span class="tag-pill">Anomaly ranking</span>
+  <span class="tag-pill">Human-in-the-loop review</span>
 </div>
   </div>
 </section>
@@ -301,7 +418,7 @@
     <h2 class="title is-3 section-title">From AnoDDPM to D4diffCyto</h2>
 <div class="content">
   <p>
-    The starting point is AnoDDPM-style anomaly detection. Instead of generating a sample from pure noise, the test image is noised only up to an intermediate diffusion step and then denoised back. This partial diffusion reconstruction is useful because the model is trained on normal data, so the reverse process tends to reconstruct a pseudo-normal version of the query. The anomaly map is obtained from the reconstruction residual.
+    The starting point is AnoDDPM-style anomaly detection. Instead of generating a sample from pure noise, the test image is noised only up to an intermediate diffusion step and then denoised back. Because the model is trained on normal data, the reverse process tends to reconstruct a pseudo-normal version of the query. The anomaly map is obtained from the reconstruction residual.
   </p>
   <div class="small-equation">
     Input patch x0 → partial noising to xt* → reverse diffusion reconstruction x̂0<br>
@@ -625,12 +742,14 @@
 <section class="section">
   <div class="container is-max-desktop">
     <h2 class="title is-3 section-title">BibTeX</h2>
-<pre class="bibtex-box"><code>@inproceedings{chatterjee2026d4diffcyto,
+<pre class="bibtex-box"><code>@misc{chatterjee2026d4diffcyto,
 
-title     = {Group Equivariant Diffusion for Anomaly Detection in Computational Cytology},
-author    = {Chatterjee, Swarnadip and Sivakumar, Ssharvien Kumar and Mukhopadhyay, Anirban},
-booktitle = {Medical Image Computing and Computer Assisted Intervention – MICCAI},
-year      = {2026}
+title         = {Group Equivariant Diffusion for Anomaly Detection in Computational Cytology},
+author        = {Chatterjee, Swarnadip and Sivakumar, Ssharvien Kumar and Mukhopadhyay, Anirban},
+year          = {2026},
+eprint        = {2607.25503},
+archivePrefix = {arXiv},
+primaryClass  = {cs.CV}
 }
 
   </div>
